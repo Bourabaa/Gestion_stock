@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Gestion des transferts</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            background-color: #f4f6f8;
+        }
+
+        .sidebar {
+            width: 230px;
+            background-color: #1e293b;
+            color: #fff;
+            padding: 20px 15px;
+            height: 100vh;
+            box-sizing: border-box;
+            position: fixed;
+            left: 0;
+            top: 0;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h4 {
+            font-size: 1.3em;
+            margin-bottom: 25px;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #334155;
+            color: #fff;
+        }
+
+
+
+        .content {
+            margin-left: 240px;
+            padding: 30px;
+            flex: 1;
+        }
+
+        h2 {
+            color: #1f2937;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #334155;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f3f4f6;
+        }
+
+        .delete-btn {
+            color: purple;
+            text-decoration: none;
+        }
+
+        .delete-btn:hover {
+            text-decoration: underline;
+        }
+
+        .add-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #334155;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        .add-link:hover {
+            background-color: #334155;
+        }
+    </style>
+</head>
+<body>
+
+
+<div class="sidebar">
+    <h4>Menu</h4>
+    <a href="/entrepots"><i data-lucide="warehouse"></i> Entrepôts</a>
+    <a href="/receptions"><i data-lucide="truck"></i> Réceptions</a>
+    <a href="/produits"><i data-lucide="package"></i> Produits</a>
+    <a href="/stocks/liste"><i data-lucide="layers"></i> Stock</a>
+    <a href="/transferts"><i data-lucide="repeat"></i> Transferts</a>
+    <a href="/sorties"><i data-lucide="log-out"></i> Sorties</a>
+    <a href="/inventaires"><i data-lucide="clipboard-list"></i> Inventaire</a>
+</div>
+
+<div class="content">
+    <h2>Liste des transferts</h2>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Date</th>
+            <th>Produit</th>
+            <th>Unité</th>
+            <th>Quantité</th>
+            <th>Source</th>
+            <th>Destination</th>
+            <th>Supprimer</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="t : ${transferts}">
+            <td th:text="${t.dateTransfert}"></td>
+            <td th:text="${t.produit != null ? t.produit.nom : '---'}"></td>
+            <td th:text="${t.unite}"></td>
+            <td th:text="${t.quantite}"></td>
+            <td th:text="${t.entrepotSourceNom}">---</td>
+            <td th:text="${t.entrepotDestinyNom}">---</td>
+            <td><a th:href="@{'/transferts/delete/' + ${t.id}}" class="delete-btn" onclick="return confirm('Supprimer ce transfert ?')"> Supprimer</a></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <a href="/transferts/nouveau" class="add-link"> Nouveau transfert</a>
+</div>
+<script>
+    lucide.createIcons();
+</script>
+</body>
+</html>

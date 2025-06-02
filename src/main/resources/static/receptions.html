@@ -1,0 +1,142 @@
+<!-- receptions.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Gestion des Réceptions</title>
+    <style>
+	    body {
+	        margin: 0;
+	        font-family: Arial, sans-serif;
+	        display: flex;
+	    }
+	
+	    .sidebar {
+	        width: 220px;
+	        background-color: #f8f8f8;
+	        padding: 10px;
+	        border-right: 1px solid #ddd;
+	        height: 100vh;
+	        box-sizing: border-box;
+	        position: fixed;
+	        left: 0;
+	        top: 0;
+	    }
+	
+	    .content {
+	        margin-left: 240px; /* espace laissé pour le menu */
+	        padding: 20px;
+	        flex: 1;
+	    }
+	
+	    .menu-title {
+	        font-weight: bold;
+	        margin-bottom: 15px;
+	    }
+	
+	    .menu-item {
+	        margin: 10px 0;
+	        display: flex;
+	        align-items: center;
+	    }
+	
+	    .menu-item img {
+	        width: 20px;
+	        height: 20px;
+	        margin-right: 8px;
+	    }
+	
+	    table {
+	        border-collapse: collapse;
+	        width: 100%;
+	    }
+	
+	    th, td {
+	        border: 1px solid black;
+	        padding: 6px;
+	    }
+	</style>
+    
+</head>
+<body>
+    <!-- Copie du carré de menu -->
+    <div class="sidebar">
+        <h4>📁 Menu</h4>
+        <ul style="list-style-type: none; padding: 0;">
+            <li><a href="/entrepots">🏠 Entrepôts</a></li>
+            <li><a href="/receptions">📦 Réceptions</a></li>
+            <li><a href="/produits">🧾 Produits</a></li>
+            <li><a href="/stock">📊 Stock</a></li>
+        </ul>
+    </div>
+
+	<div class="content">
+
+	    <h2>Liste des réceptions</h2>
+	
+	    <!-- 🔍 Barre de recherche -->
+	    <form method="get" action="#" style="margin-bottom: 20px;">
+	        <label for="dateDebut">Date de réception</label> :
+	        De:
+	        <input type="date" id="dateDebut" name="dateDebut" th:value="${dateDebut}" />
+	        À:
+	        <input type="date" id="dateFin" name="dateFin" th:value="${dateFin}" />
+	
+	        <br><br>
+	
+	        <label for="produit">Produit</label>
+	        <input type="text" id="produit" name="produit" th:value="${produit}" />
+			<br><br>
+	        <label for="entrepot">Entrepôt</label>
+	        <select id="entrepot" name="entrepot">
+	            <option value="">-- Tous --</option>
+	            <option th:each="e : ${entrepots}" th:value="${e.id}" th:text="${e.nom}" 
+	                th:selected="${e.id == selectedEntrepot}">
+	            </option>
+	        </select>
+			<br><br>  
+			
+	        <button type="submit">Chercher</button>
+	    </form>
+	
+	    <!-- 🧾 Tableau des réceptions -->
+	    <table border="1" style="width: 100%; border-collapse: collapse; text-align: center;">
+	        <thead>
+	            <tr>
+	                <th>Date réception</th>
+	                <th>N° doc d'ach</th>
+	                <th>Produit</th>
+	                <th>Unit</th>
+	                <th>Quantité</th>
+	                <th>Source</th>
+	                <th>Entrepot</th>
+	                <th>Remarque</th>
+	                <th></th> <!-- Modifier -->
+	                <th></th> <!-- Supprimer -->
+	            </tr>
+	        </thead>
+	        <tbody>
+	            <tr th:each="r : ${reception}">
+				    <td th:text="${#dates.format(r.dateReception, 'dd/MM/yyyy')}"></td>
+				    <td th:text="${r.numeroDocumentAchat}"></td>
+				    <td th:text="${r.produit != null ? r.produit.nom : ''}"></td> 
+				    <td th:text="${r.produit != null ? r.produit.unite : ''}"></td> 
+				    <td th:text="${r.quantite}"></td>
+				    <td th:text="${r.source}"></td>
+				    <td th:text="${r.entrepot != null ? r.entrepot.nom : ''}"></td> 
+				    <td th:text="${r.remarque != null ? r.remarque : ''}"></td> 
+				    <td><a th:href="@{/receptions/edit/{id}(id=${r.id})}">Modifier</a></td>
+				    <td><a th:href="@{/receptions/delete/{id}(id=${r.id})}" onclick="return confirm('Supprimer cette réception ?')">Supprimer</a></td>
+				</tr>
+
+	        </tbody>
+	    </table>
+	
+	    <div style="margin-top: 10px;">
+	        <a href="/receptions2">Nouvelle réception</a>
+	        <a href="#" style="float: right;">suivant >></a>
+	    </div>
+	</div>
+
+
+</body>
+</html>

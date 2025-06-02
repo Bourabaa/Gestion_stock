@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Nouvel Inventaire</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            background-color: #f5f5f5;
+        }
+
+        .sidebar {
+            width: 230px;
+            background-color: #1e293b;
+            color: #fff;
+            padding: 20px 15px;
+            height: 100vh;
+            box-sizing: border-box;
+            position: fixed;
+            left: 0;
+            top: 0;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h4 {
+            font-size: 1.3em;
+            margin-bottom: 25px;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #334155;
+            color: #fff;
+        }
+
+
+        .content {
+            margin-left: 240px;
+            padding: 20px;
+            flex: 1;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        form {
+            background-color: #ffffff;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        select, input[type="date"], input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #334155;
+            color: white;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #334155;
+        }
+
+        .note {
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        .message {
+            color: red;
+            margin-top: 10px;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 10px;
+            color: #334155;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="sidebar">
+    <h4>Menu</h4>
+    <a href="/entrepots"><i data-lucide="warehouse"></i> Entrepôts</a>
+    <a href="/receptions"><i data-lucide="truck"></i> Réceptions</a>
+    <a href="/produits"><i data-lucide="package"></i> Produits</a>
+    <a href="/stocks/liste"><i data-lucide="layers"></i> Stock</a>
+    <a href="/transferts"><i data-lucide="repeat"></i> Transferts</a>
+    <a href="/sorties"><i data-lucide="log-out"></i> Sorties</a>
+    <a href="/inventaires"><i data-lucide="clipboard-list"></i> Inventaire</a>
+</div>
+
+<div class="content">
+    <h2> Nouvel inventaire</h2>
+
+    <!-- Formulaire pour télécharger le modèle Excel -->
+    <form method="post" action="/inventaires/generate-template">
+        <label>Entrepôt :</label>
+        <select name="entrepotId" required>
+            <option value="">-- Sélectionner --</option>
+            <option th:each="e : ${entrepots}" th:value="${e.id}" th:text="${e.nom}"></option>
+        </select>
+
+        <label>Date d'inventaire :</label>
+        <input type="date" name="dateInventaire" required />
+
+        <p class="note">
+            Le modèle Excel contiendra les quantités théoriques dans l’unité de base de chaque produit.
+        </p>
+
+        <button type="submit"> Télécharger le modèle Excel</button>
+    </form>
+
+    <!-- Formulaire pour charger le fichier Excel rempli -->
+    <form method="post" action="/inventaires/upload" enctype="multipart/form-data">
+        <label>Entrepôt :</label>
+        <select name="entrepotId" required>
+            <option value="">-- Sélectionner --</option>
+            <option th:each="e : ${entrepots}" th:value="${e.id}" th:text="${e.nom}"></option>
+        </select>
+
+        <label>Date d'inventaire :</label>
+        <input type="date" name="dateInventaire" required />
+
+        <label>Fichier Excel complété :</label>
+        <input type="file" name="file" accept=".xlsx" required />
+
+        <button type="submit"> Charger le fichier</button>
+    </form>
+
+    <p th:if="${message}" th:text="${message}" class="message"></p>
+
+    <a href="/inventaires">⬅ Retour à la liste des inventaires</a>
+</div>
+<script>
+    lucide.createIcons();
+</script>
+</body>
+</html>

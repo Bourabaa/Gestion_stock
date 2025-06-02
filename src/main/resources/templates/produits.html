@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Gestion des Produits</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            background-color: #f4f6f9;
+        }
+
+        .sidebar {
+            width: 230px;
+            background-color: #1e293b;
+            color: #fff;
+            padding: 20px 15px;
+            height: 100vh;
+            box-sizing: border-box;
+            position: fixed;
+            left: 0;
+            top: 0;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h4 {
+            font-size: 1.3em;
+            margin-bottom: 25px;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #334155;
+            color: #fff;
+        }
+
+        .content {
+            margin-left: 240px;
+            padding: 30px;
+            width: 100%;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #334155;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        form {
+            margin-top: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        form input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 6px;
+            margin-bottom: 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+
+        button[type="submit"] {
+            background-color: #334155;
+            color: white;
+        }
+
+        button[type="reset"] {
+            background-color: purple;
+            color: white;
+        }
+
+        a.action-link {
+            color: #334155;
+            text-decoration: none;
+        }
+
+        a.action-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="sidebar">
+    <h4>Menu</h4>
+    <a href="/entrepots"><i data-lucide="warehouse"></i> Entrepôts</a>
+    <a href="/receptions"><i data-lucide="truck"></i> Réceptions</a>
+    <a href="/produits"><i data-lucide="package"></i> Produits</a>
+    <a href="/stocks/liste"><i data-lucide="layers"></i> Stock</a>
+    <a href="/transferts"><i data-lucide="repeat"></i> Transferts</a>
+    <a href="/sorties"><i data-lucide="log-out"></i> Sorties</a>
+    <a href="/inventaires"><i data-lucide="clipboard-list"></i> Inventaire</a>
+</div>
+
+
+<div class="content">
+    <h2> Liste des Produits</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Code Barre</th>
+            <th>Catégorie</th>
+            <th>Description</th>
+            <th>Unité de base</th>
+            <th>Unités disponibles</th>
+            <th colspan="2">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="p : ${produits}">
+            <td th:text="${p.nom}">Nom</td>
+            <td th:text="${p.codeBarre}">Code</td>
+            <td th:text="${p.categorie}">Catégorie</td>
+            <td th:text="${p.description}">Description</td>
+            <td th:text="${p.uniteDeBase}">Base</td>
+            <td th:text="${#strings.listJoin(p.unitesDisponibles, ', ')}">Dispo</td>
+            <td><a th:href="@{'/produits/edit/' + ${p.id}}" class="action-link"> Modifier</a></td>
+            <td><a th:href="@{'/produits/delete/' + ${p.id}}" class="action-link"> Supprimer</a></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2 th:text="${produit.id == null ? ' Ajouter' : ' Modifier'} + ' un Produit'"></h2>
+    <form th:action="@{/produits/save}" method="post" th:object="${produit}">
+        <input type="hidden" th:field="*{id}" th:if="${produit.id != null}" />
+
+        <label>Nom :</label>
+        <input type="text" th:field="*{nom}" />
+        <div th:if="${#fields.hasErrors('nom')}" th:errors="*{nom}" class="error-message"></div>
+
+        <label>Code Barre :</label>
+        <input type="text" th:field="*{codeBarre}" />
+        <div th:if="${#fields.hasErrors('codeBarre')}" th:errors="*{codeBarre}" class="error-message"></div>
+
+        <label>Catégorie :</label>
+        <input type="text" th:field="*{categorie}" />
+        <div th:if="${#fields.hasErrors('categorie')}" th:errors="*{categorie}" class="error-message"></div>
+
+        <label>Description :</label>
+        <input type="text" th:field="*{description}" />
+        <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error-message"></div>
+
+        <label>Unité de base :</label>
+        <input type="text" th:field="*{uniteDeBase}" />
+        <div th:if="${#fields.hasErrors('uniteDeBase')}" th:errors="*{uniteDeBase}" class="error-message"></div>
+
+        <label>Unités disponibles (séparées par virgule) :</label>
+        <input type="text" th:field="*{unitesDisponibles}" />
+        <div th:if="${#fields.hasErrors('unitesDisponibles')}" th:errors="*{unitesDisponibles}" class="error-message"></div>
+
+        <label>Conversions (ex: boite:24, paquet:12) :</label>
+        <input type="text" th:field="*{conversionsString}" />
+        <div th:if="${#fields.hasErrors('conversionsString')}" th:errors="*{conversionsString}" class="error-message"></div>
+
+        <button type="submit" th:text="${produit.id == null ? 'Ajouter' : 'Mettre à jour'}"></button>
+        <button type="reset">Annuler</button>
+    </form>
+</div>
+<script>
+    lucide.createIcons();
+</script>
+
+</body>
+</html>

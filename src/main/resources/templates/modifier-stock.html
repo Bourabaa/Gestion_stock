@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Modifier un Stock</title>
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; display: flex; }
+        .sidebar {
+            width: 220px; background-color: #f8f8f8; padding: 10px;
+            border-right: 1px solid #ddd; height: 100vh;
+            position: fixed; left: 0; top: 0;
+        }
+        .content {
+            margin-left: 240px; padding: 20px; flex: 1;
+        }
+    </style>
+</head>
+<body>
+<div class="sidebar">
+    <h4>📁 Menu</h4>
+    <ul style="list-style-type: none; padding: 0;">
+        <li><a href="/entrepots">🏠 Entrepôts</a></li>
+        <li><a href="/receptions">📦 Réceptions</a></li>
+        <li><a href="/produits">🧾 Produits</a></li>
+        <li><a href="/stocks/liste">📊 Stock</a></li>
+        <li><a href="/transferts">🔁 Transferts</a></li>
+        <li><a href="/sorties">🚪 sorties</a></li>
+        <li><a href="/inventaires">🧮 Inventaire</a></li>
+    </ul>
+</div>
+<div class="content">
+    <h2>Modifier un stock</h2>
+    <p style="color:red;">Attention : ce formulaire est réservé aux corrections exceptionnelles.</p>
+
+    <form th:action="@{/stocks/update}" th:object="${stock}" method="post">
+        <input type="hidden" th:field="*{id}" />
+
+        <label>Produit :</label>
+        <select th:field="*{produit.id}">
+            <option th:each="produit : ${produits}" th:value="${produit.id}" th:text="${produit.nom}"></option>
+        </select><br/><br/>
+
+        <label>Entrepôt :</label>
+        <select th:field="*{entrepot.id}">
+            <option th:each="entrepot : ${entrepots}" th:value="${entrepot.id}" th:text="${entrepot.nom}"></option>
+        </select><br/><br/>
+
+        <label>Quantité :</label>
+        <input type="number" th:field="*{quantite}" /><br/><br/>
+
+        <label>Unité :</label>
+        <input type="text" th:field="*{unite}" /><br/><br/>
+
+        <button type="submit">Mettre à jour</button>
+        <a href="/stocks/liste">Annuler</a>
+    </form>
+</div>
+</body>
+</html>

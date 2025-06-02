@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Liste des Stocks</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 230px;
+            background-color: #1e293b;
+            color: #fff;
+            padding: 20px 15px;
+            height: 100vh;
+            box-sizing: border-box;
+            position: fixed;
+            left: 0;
+            top: 0;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h4 {
+            font-size: 1.3em;
+            margin-bottom: 25px;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #334155;
+            color: #fff;
+        }
+
+
+        .content {
+            margin-left: 240px;
+            padding: 30px;
+            flex: 1;
+        }
+
+        h2 {
+            color: #2c3e50;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+        }
+
+        thead {
+            background-color: #334155;
+            color: white;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tbody tr:hover {
+            background-color: #e6f7ff;
+        }
+
+        .message {
+            color: #334155;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .action-link {
+            color: #334155;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .action-link:hover {
+            text-decoration: underline;
+        }
+
+        p.info {
+            color: #555;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h4>Menu</h4>
+    <a href="/entrepots"><i data-lucide="warehouse"></i> Entrepôts</a>
+    <a href="/receptions"><i data-lucide="truck"></i> Réceptions</a>
+    <a href="/produits"><i data-lucide="package"></i> Produits</a>
+    <a href="/stocks/liste"><i data-lucide="layers"></i> Stock</a>
+    <a href="/transferts"><i data-lucide="repeat"></i> Transferts</a>
+    <a href="/sorties"><i data-lucide="log-out"></i> Sorties</a>
+    <a href="/inventaires"><i data-lucide="clipboard-list"></i> Inventaire</a>
+</div>
+
+<div class="content">
+    <div th:if="${message}" class="message">
+        <p th:text="${message}"></p>
+    </div>
+    <div th:if="${error}" class="error">
+        <p th:text="${error}"></p>
+    </div>
+
+    <h2>Liste des Stocks</h2>
+    <p class="info">Le stock est automatiquement mis à jour via Réceptions, Transferts et Inventaire.</p>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Produit</th>
+            <th>Entrepôt</th>
+            <th>Quantité</th>
+            <th>Unité (base)</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="stock : ${stocks}">
+            <td th:text="${stock.id}"></td>
+            <td th:text="${stock.produit.nom}"></td>
+            <td th:text="${stock.entrepot.nom}"></td>
+            <td th:text="${stock.quantite}"></td>
+            <td th:text="${stock.produit.uniteDeBase}"></td>
+            <td>
+                <a th:href="@{/stocks/delete/{id}(id=${stock.id})}" class="action-link"> Supprimer</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<script>
+    lucide.createIcons();
+</script>
+</body>
+</html>

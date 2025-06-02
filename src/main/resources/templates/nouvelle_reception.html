@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title>Nouvelle Réception</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="https://unpkg.com/lucide@latest"></script>
+	<style>
+		body {
+			margin: 0;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			background-color: #f4f6f9;
+			display: flex;
+		}
+
+		.sidebar {
+			width: 230px;
+			background-color: #1e293b;
+			color: #fff;
+			padding: 20px 15px;
+			height: 100vh;
+			box-sizing: border-box;
+			position: fixed;
+			left: 0;
+			top: 0;
+			box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+		}
+
+		.sidebar h4 {
+			font-size: 1.3em;
+			margin-bottom: 25px;
+			letter-spacing: 0.5px;
+		}
+
+		.sidebar a {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			padding: 10px 12px;
+			color: #cbd5e1;
+			text-decoration: none;
+			border-radius: 8px;
+			margin-bottom: 8px;
+			transition: background-color 0.3s, color 0.3s;
+		}
+
+		.sidebar a:hover {
+			background-color: #334155;
+			color: #fff;
+		}
+
+
+
+		.content {
+			margin-left: 240px;
+			padding: 40px;
+			flex: 1;
+		}
+
+		.form-card {
+			background-color: #fff;
+			padding: 30px;
+			border-radius: 10px;
+			box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+			max-width: 600px;
+			margin: auto;
+		}
+
+		.form-card h2 {
+			margin-top: 0;
+			text-align: center;
+			color: #334155;
+		}
+
+		label {
+			display: block;
+			margin-bottom: 6px;
+			font-weight: 600;
+			color: #333;
+		}
+
+		input[type="text"],
+		input[type="date"],
+		select,
+		textarea {
+			width: 100%;
+			padding: 10px;
+			margin-bottom: 18px;
+			border: 1px solid #ccc;
+			border-radius: 6px;
+			box-sizing: border-box;
+		}
+
+		textarea {
+			resize: vertical;
+		}
+
+		button {
+			background-color: #334155;
+			color: white;
+			padding: 12px 20px;
+			border: none;
+			border-radius: 6px;
+			cursor: pointer;
+			font-size: 16px;
+			width: 100%;
+		}
+
+		button:hover {
+			background-color: #334155;
+		}
+
+		@media (max-width: 768px) {
+			.sidebar {
+				display: none;
+			}
+
+			.content {
+				margin-left: 0;
+				padding: 20px;
+			}
+		}
+	</style>
+</head>
+<body>
+<div class="sidebar">
+	<h4>Menu</h4>
+	<a href="/entrepots"><i data-lucide="warehouse"></i> Entrepôts</a>
+	<a href="/receptions"><i data-lucide="truck"></i> Réceptions</a>
+	<a href="/produits"><i data-lucide="package"></i> Produits</a>
+	<a href="/stocks/liste"><i data-lucide="layers"></i> Stock</a>
+	<a href="/transferts"><i data-lucide="repeat"></i> Transferts</a>
+	<a href="/sorties"><i data-lucide="log-out"></i> Sorties</a>
+	<a href="/inventaires"><i data-lucide="clipboard-list"></i> Inventaire</a>
+</div>
+
+<div class="content">
+	<div class="form-card">
+		<h2>Nouvelle Réception</h2>
+		<form method="post" th:action="@{/receptions2/save}" onsubmit="disableSubmitButton()">
+		<label>Date d'achat :</label>
+			<input type="date" name="dateReception" required>
+
+			<label>Numéro d'achat :</label>
+			<input type="text" name="numAchat" required>
+
+			<label>Produit :</label>
+			<select id="produit" name="produitId" required>
+				<option value="">-- Sélectionnez un produit --</option>
+				<option th:each="produit : ${produits}"
+						th:value="${produit.id}"
+						th:text="${produit.nom}">
+				</option>
+			</select>
+
+			<label>Unité :</label>
+			<select id="unite" name="unite" required>
+				<option value="">-- Sélectionnez un produit d'abord --</option>
+			</select>
+
+			<label>Quantité :</label>
+			<input type="text" name="quantite" required>
+
+			<label>Entrepôt :</label>
+			<select name="entrepotId" required>
+				<option value="">-- Sélectionnez un entrepôt --</option>
+				<option th:each="e : ${entrepots}" th:value="${e.id}" th:text="${e.nom}"></option>
+			</select>
+
+			<label>Source :</label>
+			<input type="text" name="source" required>
+
+			<label>Remarque :</label>
+			<textarea name="remarque" rows="3"></textarea>
+
+			<button type="submit"> Valider la Réception</button>
+		</form>
+	</div>
+</div>
+
+<script>
+	document.getElementById('produit').addEventListener('change', function () {
+		const produitId = this.value;
+		const uniteSelect = document.getElementById('unite');
+
+		uniteSelect.innerHTML = '<option value="">Chargement des unités...</option>';
+
+		if (!produitId) {
+			uniteSelect.innerHTML = '<option value="">-- Sélectionnez un produit d\'abord --</option>';
+			return;
+		}
+
+		fetch(`/produits/unites/${produitId}`)
+				.then(response => {
+					if (!response.ok) throw new Error('Erreur de chargement');
+					return response.json();
+				})
+				.then(data => {
+					uniteSelect.innerHTML = '';
+					data.forEach(unite => {
+						const option = document.createElement('option');
+						option.value = unite;
+						option.text = unite;
+						uniteSelect.appendChild(option);
+					});
+				})
+				.catch(error => {
+					console.error(error);
+					uniteSelect.innerHTML = '<option value="">Erreur de chargement</option>';
+				});
+	});
+</script>
+<script>
+	lucide.createIcons();
+</script>
+<script>
+	function disableSubmitButton() {
+		const button = document.querySelector('form button[type="submit"]');
+		button.disabled = true;
+		button.textContent = "Traitement...";
+	}
+</script>
+
+</body>
+</html>

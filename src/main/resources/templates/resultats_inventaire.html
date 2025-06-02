@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Résultats de l'inventaire</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; display: flex; }
+    .sidebar {
+      width: 230px;
+      background-color: #1e293b;
+      color: #fff;
+      padding: 20px 15px;
+      height: 100vh;
+      box-sizing: border-box;
+      position: fixed;
+      left: 0;
+      top: 0;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar h4 {
+      font-size: 1.3em;
+      margin-bottom: 25px;
+      letter-spacing: 0.5px;
+    }
+
+    .sidebar a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      color: #cbd5e1;
+      text-decoration: none;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: #334155;
+      color: #fff;
+    }
+
+    .content { margin-left: 240px; padding: 20px; flex: 1; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid black; padding: 6px; }
+  </style>
+</head>
+<body>
+<div class="sidebar">
+  <h4>Menu</h4>
+  <a href="/entrepots"><i data-lucide="warehouse"></i> Entrepôts</a>
+  <a href="/receptions"><i data-lucide="truck"></i> Réceptions</a>
+  <a href="/produits"><i data-lucide="package"></i> Produits</a>
+  <a href="/stocks/liste"><i data-lucide="layers"></i> Stock</a>
+  <a href="/transferts"><i data-lucide="repeat"></i> Transferts</a>
+  <a href="/sorties"><i data-lucide="log-out"></i> Sorties</a>
+  <a href="/inventaires"><i data-lucide="clipboard-list"></i> Inventaire</a>
+</div>
+
+<div class="content">
+  <h2>Résultats de l'inventaire</h2>
+
+  <p style="color: gray;">
+    Les quantités saisies seront converties en unité de base pour ajuster le stock.
+  </p>
+
+  <form method="post" action="/inventaires/valider">
+    <input type="hidden" name="entrepotId" th:value="${inventaire.entrepotId}" />
+    <input type="hidden" name="dateInventaire" th:value="${inventaire.dateInventaire}" />
+
+    <table>
+      <thead>
+      <tr>
+        <th>Produit</th>
+        <th>Unité</th>
+        <th>Théorique</th>
+        <th>Réel</th>
+        <th>Écart</th>
+        <th>Justification</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="l : ${inventaire.lignes}">
+        <td>
+          <input type="hidden" name="produit" th:value="${l.produit}" />
+          <span th:text="${l.produit}"></span>
+        </td>
+        <td>
+          <input type="hidden" name="unite" th:value="${l.unite}" />
+          <span th:text="${l.unite}"></span>
+        </td>
+        <td>
+          <input type="hidden" name="theorique" th:value="${l.stockThéorique}" />
+          <span th:text="${l.stockThéorique}"></span>
+        </td>
+        <td>
+          <input type="number" name="reel" th:value="${l.stockRéel != null ? l.stockRéel : 0}" required />
+        </td>
+        <td th:text="${l.ecart} + ' unités'"></td>
+        <td><input type="text" name="justification" placeholder="Saisir une justification" /></td>
+      </tr>
+
+      </tbody>
+    </table>
+
+    <br>
+    <strong>
+      Écart total : <span th:text="${inventaire.ecartTotal} + ' unités'"></span>
+    </strong>
+
+    <br><br>
+    <label>Remarque générale :</label><br>
+    <textarea name="remarque" rows="3" cols="60"></textarea>
+
+    <br><br>
+    <button type="submit">Valider l'inventaire</button>
+  </form>
+</div>
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>

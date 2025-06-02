@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<title>Gestion des Réceptions</title>
+	<script src="https://unpkg.com/lucide@latest"></script>
+	<style>
+		body {
+			margin: 0;
+			font-family: 'Inter', sans-serif;
+			background-color: #f4f6f8;
+			display: flex;
+		}
+
+		.sidebar {
+			width: 230px;
+			background-color: #1e293b;
+			color: #fff;
+			padding: 20px 15px;
+			height: 100vh;
+			box-sizing: border-box;
+			position: fixed;
+			left: 0;
+			top: 0;
+			box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+		}
+
+		.sidebar h4 {
+			font-size: 1.3em;
+			margin-bottom: 25px;
+			letter-spacing: 0.5px;
+		}
+
+		.sidebar a {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			padding: 10px 12px;
+			color: #cbd5e1;
+			text-decoration: none;
+			border-radius: 8px;
+			margin-bottom: 8px;
+			transition: background-color 0.3s, color 0.3s;
+		}
+
+		.sidebar a:hover {
+			background-color: #334155;
+			color: #fff;
+		}
+
+
+
+
+		.content {
+			margin-left: 250px;
+			padding: 40px 30px;
+			width: 100%;
+		}
+
+		h2 {
+			color: #333;
+			margin-bottom: 20px;
+		}
+
+		form {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 20px;
+			background-color: #fff;
+			padding: 20px;
+			border-radius: 10px;
+			box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+			margin-bottom: 30px;
+		}
+
+		form label {
+			flex: 1 1 100%;
+			font-weight: 600;
+			color: #333;
+		}
+
+		form input[type="date"],
+		form select {
+			flex: 1 1 calc(50% - 10px);
+			padding: 10px;
+			border: 1px solid #ccc;
+			border-radius: 5px;
+			margin-top: 5px;
+		}
+
+		form button,
+		form a[href="/receptions"] {
+			padding: 10px 20px;
+			border-radius: 6px;
+			font-weight: bold;
+			border: none;
+			cursor: pointer;
+			text-decoration: none;
+			display: inline-block;
+			transition: 0.3s;
+			margin-top: 15px;
+		}
+
+		form button {
+			background-color: #334155;
+			color: white;
+		}
+
+		form button:hover {
+			background-color: #334155;
+		}
+
+		form a[href="/receptions"] {
+			background-color: #ccc;
+			color: #333;
+		}
+
+		form a[href="/receptions"]:hover {
+			background-color: #bbb;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			background-color: #fff;
+			box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+		}
+
+		th, td {
+			text-align: left;
+			padding: 12px;
+			border-bottom: 1px solid #ddd;
+		}
+
+		th {
+			background-color: #334155;
+			color: white;
+		}
+
+		tr:hover {
+			background-color: #f1f1f1;
+		}
+
+		.actions a {
+			margin-right: 10px;
+			text-decoration: none;
+			color: #334155;
+			font-weight: bold;
+		}
+
+		.actions a:hover {
+			text-decoration: underline;
+		}
+
+		.new-reception {
+			display: inline-block;
+			margin-top: 20px;
+			padding: 12px 24px;
+			background-color: #334155;
+			color: white;
+			font-weight: bold;
+			text-decoration: none;
+			border-radius: 6px;
+			transition: 0.3s;
+		}
+
+		.new-reception:hover {
+			background-color: #334155;
+		}
+
+		@media (max-width: 768px) {
+			.sidebar {
+				display: none;
+			}
+
+			.content {
+				margin-left: 0;
+				padding: 20px;
+			}
+
+			form input,
+			form select {
+				flex: 1 1 100%;
+			}
+		}
+	</style>
+</head>
+<body>
+<div class="sidebar">
+	<h4>Menu</h4>
+	<a href="/entrepots"><i data-lucide="warehouse"></i> Entrepôts</a>
+	<a href="/receptions"><i data-lucide="truck"></i> Réceptions</a>
+	<a href="/produits"><i data-lucide="package"></i> Produits</a>
+	<a href="/stocks/liste"><i data-lucide="layers"></i> Stock</a>
+	<a href="/transferts"><i data-lucide="repeat"></i> Transferts</a>
+	<a href="/sorties"><i data-lucide="log-out"></i> Sorties</a>
+	<a href="/inventaires"><i data-lucide="clipboard-list"></i> Inventaire</a>
+</div>
+<div class="content">
+	<h2>Liste des réceptions</h2>
+
+	<form method="get" action="/receptions/filtrer">
+		<label for="dateDebut">Date de début :</label>
+		<input type="date" id="dateDebut" name="dateDebut" th:value="${dateDebut}" />
+
+		<label for="dateFin">Date de fin :</label>
+		<input type="date" id="dateFin" name="dateFin" th:value="${dateFin}" />
+
+		<label for="produitId">Produit :</label>
+		<select id="produitId" name="produitId">
+			<option value="">Tous les produits</option>
+			<option th:each="produit : ${produits}"
+					th:value="${produit.id}"
+					th:text="${produit.nom}"
+					th:selected="${produit.id == produitId}"></option>
+		</select>
+
+		<label for="entrepotId">Entrepôt :</label>
+		<select id="entrepotId" name="entrepotId">
+			<option value="">Tous les entrepôts</option>
+			<option th:each="entrepot : ${entrepots}"
+					th:value="${entrepot.id}"
+					th:text="${entrepot.nom}"
+					th:selected="${entrepot.id == entrepotId}"></option>
+		</select>
+
+		<button type="submit"> Filtrer</button>
+		<a href="/receptions">Réinitialiser</a>
+	</form>
+
+	<table>
+		<thead>
+		<tr>
+			<th>Date réception</th>
+			<th>Document achat</th>
+			<th>Produit</th>
+			<th>Unité</th>
+			<th>Quantité</th>
+			<th>Source</th>
+			<th>Entrepôt</th>
+			<th>Remarque</th>
+			<th colspan="2">Actions</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr th:each="r : ${receptions}">
+			<td th:text="${#temporals.format(r.dateReception, 'dd/MM/yyyy')}"></td>
+			<td th:text="${r.numAchat}"></td>
+			<td th:text="${r.produit != null ? r.produit.nom : ''}"></td>
+			<td th:text="${r.unite}"></td>
+			<td th:text="${r.quantite}"></td>
+			<td th:text="${r.source}"></td>
+			<td th:text="${r.entrepot != null ? r.entrepot.nom : ''}"></td>
+			<td th:text="${r.remarque != null ? r.remarque : ''}"></td>
+			<td class="actions"><a th:href="@{/receptions/edit/{id}(id=${r.id})}"> Modifier</a></td>
+			<td class="actions"><a th:href="@{/receptions/delete/{id}(id=${r.id})}" onclick="return confirm('Supprimer cette réception ?')"> Supprimer</a></td>
+		</tr>
+		</tbody>
+	</table>
+
+	<a href="/receptions/nouvelle" class="new-reception"> Nouvelle réception</a>
+</div>
+<script>
+	lucide.createIcons();
+</script>
+
+</body>
+</html>
